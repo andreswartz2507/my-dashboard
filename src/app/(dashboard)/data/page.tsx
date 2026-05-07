@@ -1,3 +1,5 @@
+"use client";
+
 import { DataTable, Column } from "@/components/DataTable";
 
 interface User {
