@@ -1,24 +1,17 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { DataTable, Column } from "@/components/DataTable";
+import { supabase } from "@/lib/supabase";
 
 interface User {
+  id: string;
   name: string;
   email: string;
   role: string;
   status: string;
   joined: string;
 }
-
-const data: User[] = [
-  { name: "Alice Martin", email: "alice@example.com", role: "Admin", status: "Active", joined: "2024-01-15" },
-  { name: "Bob Chen", email: "bob@example.com", role: "Editor", status: "Active", joined: "2024-02-20" },
-  { name: "Carol White", email: "carol@example.com", role: "Viewer", status: "Inactive", joined: "2024-03-05" },
-  { name: "David Kim", email: "david@example.com", role: "Editor", status: "Active", joined: "2024-03-18" },
-  { name: "Eva Rossi", email: "eva@example.com", role: "Admin", status: "Active", joined: "2024-04-02" },
-  { name: "Frank Müller", email: "frank@example.com", role: "Viewer", status: "Inactive", joined: "2024-04-11" },
-  { name: "Grace Lee", email: "grace@example.com", role: "Editor", status: "Active", joined: "2024-05-07" },
-];
 
 const columns: Column<User>[] = [
   { key: "name", header: "Name" },
@@ -43,11 +36,50 @@ const columns: Column<User>[] = [
 ];
 
 export default function DataPage() {
+  const [data, setData] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchUsers() {
+      const { data: users, error } = await supabase
+        .from("users")
+        .select("id, name, email, role, status, joined")
+        .order("joined", { ascending: true });
+
+      if (error) {
+        setError(error.message);
+      } else {
+        setData(users ?? []);
+      }
+      setLoading(false);
+    }
+
+    fetchUsers();
+  }, []);
+
   return (
     <div className="max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold text-slate-900 mb-1">Data</h1>
       <p className="text-sm text-slate-500 mb-8">Browse and search your records.</p>
-      <DataTable data={data} columns={columns} />
+
+      {loading && (
+        <div className="flex items-center gap-2 text-sm text-slate-400">
+          <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+          </svg>
+          Loading…
+        </div>
+      )}
+
+      {error && (
+        <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+          Failed to load data: {error}
+        </div>
+      )}
+
+      {!loading && !error && <DataTable data={data} columns={columns} />}
     </div>
   );
 }
