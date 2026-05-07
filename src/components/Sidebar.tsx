@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 const navLinks = [
   {
@@ -10,6 +11,15 @@ const navLinks = [
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a1 1 0 011-1h6a1 1 0 011 1v5a1 1 0 01-1 1H4a1 1 0 01-1-1V7zM13 7a1 1 0 011-1h3a1 1 0 011 1v2a1 1 0 01-1 1h-3a1 1 0 01-1-1V7zM13 14a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-3zM3 16a1 1 0 011-1h6a1 1 0 011 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1v-1z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/tasks",
+    label: "Tasks",
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
       </svg>
     ),
   },
@@ -36,6 +46,13 @@ const navLinks = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <aside className="flex flex-col w-16 md:w-60 h-screen bg-slate-900 text-slate-100 flex-shrink-0 transition-all duration-200">
@@ -70,14 +87,25 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* User */}
-      <div className="flex items-center gap-3 px-4 py-4 border-t border-slate-700">
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500 flex-shrink-0 text-white text-sm font-semibold">
-          A
-        </div>
-        <div className="hidden md:block min-w-0">
-          <p className="text-sm font-medium text-slate-100 truncate">Andre</p>
-          <p className="text-xs text-slate-400 truncate">andreswartz2507@gmail.com</p>
+      {/* User + Logout */}
+      <div className="border-t border-slate-700">
+        <div className="flex items-center gap-3 px-4 py-4">
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500 flex-shrink-0 text-white text-sm font-semibold">
+            A
+          </div>
+          <div className="hidden md:block min-w-0 flex-1">
+            <p className="text-sm font-medium text-slate-100 truncate">Andre</p>
+            <p className="text-xs text-slate-400 truncate">andreswartz2507@gmail.com</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            title="Sign out"
+            className="hidden md:flex text-slate-400 hover:text-slate-100 transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
         </div>
       </div>
     </aside>
