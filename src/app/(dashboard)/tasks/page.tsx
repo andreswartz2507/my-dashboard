@@ -31,18 +31,45 @@ export default function TasksPage() {
   const [title, setTitle] = useState("");
   const [adding, setAdding] = useState(false);
 
-  async function fetchTasks() {
-    const { data, error } = await supabase
+  useEffect(() => {
+    // Initial fetch
+    supabase
       .from("tasks")
       .select("id, title, status, created_at")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (error) setError(error.message);
+        else setTasks(data ?? []);
+        setLoading(false);
+      });
 
-    if (error) setError(error.message);
-    else setTasks(data ?? []);
-    setLoading(false);
-  }
+    // Realtime subscription
+    const channel = supabase
+      .channel("tasks-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tasks" },
+        (payload) => {
+          if (payload.eventType === "INSERT") {
+            const task = payload.new as Task;
+            setTasks((prev) =>
+              prev.some((t) => t.id === task.id) ? prev : [task, ...prev]
+            );
+          } else if (payload.eventType === "UPDATE") {
+            const updated = payload.new as Task;
+            setTasks((prev) =>
+              prev.map((t) => (t.id === updated.id ? updated : t))
+            );
+          } else if (payload.eventType === "DELETE") {
+            const deleted = payload.old as { id: string };
+            setTasks((prev) => prev.filter((t) => t.id !== deleted.id));
+          }
+        }
+      )
+      .subscribe();
 
-  useEffect(() => { fetchTasks(); }, []);
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -56,33 +83,34 @@ export default function TasksPage() {
       user_id: user!.id,
     });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setTitle("");
-      await fetchTasks();
-    }
+    if (error) setError(error.message);
+    else setTitle("");
     setAdding(false);
   }
 
   async function handleStatusChange(id: string, status: Status) {
+    // Optimistic update — Realtime will confirm
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)));
     await supabase.from("tasks").update({ status }).eq("id", id);
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, status } : t))
-    );
   }
 
   async function handleDelete(id: string) {
-    await supabase.from("tasks").delete().eq("id", id);
+    // Optimistic update — Realtime will confirm
     setTasks((prev) => prev.filter((t) => t.id !== id));
+    await supabase.from("tasks").delete().eq("id", id);
   }
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-slate-900 mb-1">Tasks</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="text-2xl font-bold text-slate-900">Tasks</h1>
+        <span className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Live
+        </span>
+      </div>
       <p className="text-sm text-slate-500 mb-8">Manage your personal task list.</p>
 
-      {/* Add task form */}
       <form onSubmit={handleAdd} className="flex gap-2 mb-6">
         <input
           type="text"
