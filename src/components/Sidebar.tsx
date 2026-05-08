@@ -24,6 +24,15 @@ const navLinks = [
     ),
   },
   {
+    href: "/dashboard/analytics",
+    label: "Analytics",
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    ),
+  },
+  {
     href: "/dashboard/data",
     label: "Data",
     icon: (
@@ -55,15 +64,15 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="flex flex-col w-16 md:w-60 h-screen bg-slate-900 text-slate-100 flex-shrink-0 transition-all duration-200">
+    <aside className="flex flex-col w-16 md:w-60 h-screen bg-zinc-900 text-zinc-100 flex-shrink-0 transition-all duration-200">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-5 border-b border-slate-700">
+      <div className="flex items-center gap-3 px-4 py-5 border-b border-zinc-700">
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500 flex-shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
         </div>
-        <span className="hidden md:block font-semibold text-base tracking-tight">My Dashboard</span>
+        <span className="hidden md:block font-bold text-base tracking-tight text-white">CreatorHub</span>
       </div>
 
       {/* Nav */}
@@ -76,8 +85,8 @@ export default function Sidebar() {
               href={href}
               className={`flex items-center gap-3 px-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 active
-                  ? "bg-indigo-600 text-white"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+                  ? "bg-indigo-500/20 text-indigo-300"
+                  : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
               }`}
             >
               <span className="flex-shrink-0">{icon}</span>
@@ -88,19 +97,19 @@ export default function Sidebar() {
       </nav>
 
       {/* User + Logout */}
-      <div className="border-t border-slate-700">
+      <div className="border-t border-zinc-700">
         <div className="flex items-center gap-3 px-4 py-4">
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-500 flex-shrink-0 text-white text-sm font-semibold">
             A
           </div>
           <div className="hidden md:block min-w-0 flex-1">
-            <p className="text-sm font-medium text-slate-100 truncate">Andre</p>
-            <p className="text-xs text-slate-400 truncate">andreswartz2507@gmail.com</p>
+            <p className="text-sm font-medium text-zinc-100 truncate">Andre</p>
+            <p className="text-xs text-zinc-400 truncate">andreswartz2507@gmail.com</p>
           </div>
           <button
             onClick={handleLogout}
             title="Sign out"
-            className="hidden md:flex text-slate-400 hover:text-slate-100 transition-colors"
+            className="hidden md:flex text-zinc-400 hover:text-zinc-100 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
